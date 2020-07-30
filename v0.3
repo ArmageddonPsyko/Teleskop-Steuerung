@@ -1,0 +1,180 @@
+ ///Teleskop Motor Steuerung///
+///         v0.3           ///
+
+#include "FastLED.h"
+
+#define ANZAHL_LEDS 1
+#define LED_PIN 12
+#define enA 9
+#define in1 4
+#define in2 5
+#define enB 10
+#define in3 6
+#define in4 7
+
+CRGB leds[ANZAHL_LEDS];
+
+int motorSpeedA = 0;
+int motorSpeedB = 0;
+
+
+  //Arduino pin numbers
+const int SW_pin = 2; //digital pin connected to switch output
+const int X_pin = 0; //analog pin connected to X output
+const int Y_pin = 1; //analog pin connected to Y output
+const int led_pin = 5;//led data pin
+
+
+
+void setup() {
+
+  //motor setup
+    pinMode(enA, OUTPUT);
+    pinMode(enB, OUTPUT);
+    pinMode(in1, OUTPUT);
+    pinMode(in2, OUTPUT);
+    pinMode(in3, OUTPUT);
+    pinMode(in4, OUTPUT);
+
+  //led setup
+    pinMode(SW_pin, INPUT);
+    pinMode(led_pin, OUTPUT);
+    digitalWrite(SW_pin, HIGH);
+    Serial.begin(115200);
+    FastLED.addLeds<NEOPIXEL, LED_PIN>(leds, ANZAHL_LEDS);
+    FastLED.setBrightness(20);
+    leds[0] = CRGB::Red;
+    FastLED.show();
+    delay(5000);
+    leds[0] = CRGB::Green;
+    FastLED.show();
+    delay(500);
+    leds[0] = CRGB::Red;
+    FastLED.show();
+    delay(500);
+    leds[0] = CRGB::Green;
+    FastLED.show();
+    delay(500);
+}
+
+void loop() {
+  
+  //serial monitoring
+    //Serial.print(digitalRead(SW_pin));
+    //Serial.print("\n");
+    //Serial.print("X-axis: ");
+    //Serial.print(analogRead(X_pin));
+    //Serial.print("\n");
+    //Serial.print("Y-axis: ");
+    //Serial.println(analogRead(Y_pin));
+    //Serial.print("\n\n");
+    
+    //motor status
+      //Serial.print("Alt Motor: ");{
+      //if ((digitalRead(in1)== (HIGH) && (digitalRead(in2) == (LOW))))
+      //   Serial.print("UP");
+      //else if ((((digitalRead(in2)== (HIGH) && (digitalRead(in1) == (LOW))))))
+      //  Serial.print("DOWN");
+
+
+  
+}
+
+    Serial.print(digitalRead(in1));
+    Serial.print("X-axis: ");
+    Serial.print(analogRead(X_pin));
+    Serial.print("X-axis: ");
+    Serial.print(analogRead(X_pin));
+    Serial.print("X-axis: ");
+
+
+
+
+
+  //motor control loop
+    int xAxis = analogRead(A0); // Read Joysticks X-axis
+    int yAxis = analogRead(A1); // Read Joysticks Y-axis
+      
+  //Y-axis forward and backward control (alt motor)
+    if (yAxis < 420) {
+        
+  //set Motor A backward
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+
+        
+  //convert the declining Y-axis readings for going backward from 470 to 0 into 0 to 255 value for the PWM signal for increasing the motor speed
+    motorSpeedA = map(yAxis, 420, 0, 0, 255);
+      }
+
+    else if (yAxis > 600) {
+
+        
+  //set Motor A forward
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+
+      
+  //convert the increasing Y-axis readings for going forward from 550 to 1023 into 0 to 255 value for the PWM signal for increasing the motor speed
+    motorSpeedA = map(yAxis, 600, 1023, 0, 255);
+      }
+      
+  //X-axis forward and backward control (z motor)
+    if (xAxis < 420) {
+        
+
+        
+  //set Motor B backward
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+
+        
+  //convert the declining X-axis readings to PWM value
+    motorSpeedB = map(xAxis, 420, 0, 0, 255);
+      }
+
+
+    else if (xAxis > 600) {
+
+        
+
+        
+  //set Motor B forward
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+
+        
+  //convert the increasing X-axis readings to PWM value
+    motorSpeedB = map(xAxis, 600, 1023, 0, 255);
+      }
+
+      
+  //no input motors off
+    else {
+    motorSpeedB = 0;
+      }
+
+  //buzz prevent
+    if (motorSpeedA < 70) {
+        motorSpeedA = 0;
+      }
+    if (motorSpeedB < 70) {
+      motorSpeedB = 0;
+      }
+    analogWrite(enA, motorSpeedA); // Send PWM signal to motor A
+    analogWrite(enB, motorSpeedB); // Send PWM signal to motor B
+
+  //status led
+    if ((analogRead(X_pin) > 600) || (analogRead(X_pin) < 420) || (analogRead(Y_pin) > 600) || (analogRead(Y_pin) < 420))
+  {
+    leds[0] = CRGB::Blue;
+    FastLED.show();
+
+  }
+    else
+  {
+    leds[0] = CRGB::Green;
+    FastLED.show();
+    delay(50);
+}
+}
