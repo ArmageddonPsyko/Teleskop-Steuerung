@@ -1,5 +1,5 @@
  ///Teleskop Motor Steuerung///
-///         v0.3           ///
+///         v0.4           ///
 
 #include "FastLED.h"
 
@@ -22,7 +22,7 @@ int motorSpeedB = 0;
 const int SW_pin = 2; //digital pin connected to switch output
 const int X_pin = 0; //analog pin connected to X output
 const int Y_pin = 1; //analog pin connected to Y output
-const int led_pin = 5;//led data pin
+const int led_pin = 13;//led data pin
 
 
 
@@ -78,14 +78,14 @@ void loop() {
 
 
   
-}
 
-    Serial.print(digitalRead(in1));
-    Serial.print("X-axis: ");
-    Serial.print(analogRead(X_pin));
-    Serial.print("X-axis: ");
-    Serial.print(analogRead(X_pin));
-    Serial.print("X-axis: ");
+
+   // Serial.print(digitalRead(in1));
+  //  Serial.print("X-axis: ");
+   // Serial.print(analogRead(X_pin));
+   // Serial.print("X-axis: ");
+   // Serial.print(analogRead(X_pin));
+  //  Serial.print("X-axis: ");
 
 
 
@@ -103,7 +103,7 @@ void loop() {
     digitalWrite(in2, LOW);
 
         
-  //convert the declining Y-axis readings for going backward from 470 to 0 into 0 to 255 value for the PWM signal for increasing the motor speed
+  //convert the Y-axis readings to PWM value
     motorSpeedA = map(yAxis, 420, 0, 0, 255);
       }
 
@@ -115,7 +115,7 @@ void loop() {
     digitalWrite(in2, HIGH);
 
       
-  //convert the increasing Y-axis readings for going forward from 550 to 1023 into 0 to 255 value for the PWM signal for increasing the motor speed
+  //convert the Y-axis readings to PWM value
     motorSpeedA = map(yAxis, 600, 1023, 0, 255);
       }
       
@@ -129,7 +129,7 @@ void loop() {
     digitalWrite(in4, LOW);
 
         
-  //convert the declining X-axis readings to PWM value
+  //convert X-axis readings to PWM value
     motorSpeedB = map(xAxis, 420, 0, 0, 255);
       }
 
@@ -144,7 +144,7 @@ void loop() {
     digitalWrite(in4, HIGH);
 
         
-  //convert the increasing X-axis readings to PWM value
+  //convert X-axis readings to PWM value
     motorSpeedB = map(xAxis, 600, 1023, 0, 255);
       }
 
@@ -155,15 +155,15 @@ void loop() {
       }
 
   //buzz prevent
-    if (motorSpeedA < 70) {
+    if (motorSpeedA < 1) {
         motorSpeedA = 0;
       }
-    if (motorSpeedB < 70) {
+    if (motorSpeedB < 1) {
       motorSpeedB = 0;
       }
     analogWrite(enA, motorSpeedA); // Send PWM signal to motor A
     analogWrite(enB, motorSpeedB); // Send PWM signal to motor B
-
+{
   //status led
     if ((analogRead(X_pin) > 600) || (analogRead(X_pin) < 420) || (analogRead(Y_pin) > 600) || (analogRead(Y_pin) < 420))
   {
@@ -176,5 +176,6 @@ void loop() {
     leds[0] = CRGB::Green;
     FastLED.show();
     delay(50);
+  }
 }
 }
