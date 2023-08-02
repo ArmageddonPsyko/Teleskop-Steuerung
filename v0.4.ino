@@ -62,7 +62,7 @@ void setup() {
 void loop() {
  
   //////////////////////////////////
-  //Uncomment above for monitoring//
+  //Uncomment below for monitoring//
   //////////////////////////////////
   //serial monitoring
     //Serial.print(digitalRead(SW_pin));
